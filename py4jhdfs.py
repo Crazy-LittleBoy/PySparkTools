@@ -303,43 +303,6 @@ class Py4jHdfs:
             data = pd.DataFrame(data)
         return data
 
-    # @run_time_count
-    # def multi_read_hdfs(self, path, sep=',', header=None, nrows=None, processes=None):
-    #     """
-    #     多进程读取hdfs上存储的文件，输出为pandas.DataFrame
-    #     :param path 文件所在hdfs路径
-    #     :param sep 文本分隔符
-    #     :param header 设为0时表示第一行作为列名
-    #     :param nrows 读取行数
-    #     :param processes 进程数
-    #     """
-    #     if not processes:
-    #         use_processes = math.floor(psutil.cpu_count() * 0.75)
-    #     else:
-    #         use_processes = processes
-    #     files = self.ls(path, is_return=True)
-    #     files = list(map(lambda x: x[0], files))
-    #     file_flag = '/_SUCCESS'
-    #     if file_flag in files:
-    #         files = list(filter(lambda x: x != file_flag, files))
-    #         files = list(map(lambda x: path + x, files))
-    #         print('[Info]: Num of need to read files is %s' % len(files))
-    #     else:
-    #         print("[Error]: File format is incorrect! Try to use 'read()' replace 'read_hdfs()'.")
-    #         return False
-    #     pool = multiprocessing.Pool(use_processes)
-    #     chunks = []
-    #     for file_path in files:
-    #         try:
-    #             chunk = pool.apply_async(self.read, (file_path, sep, header, nrows))
-    #             chunks.append(chunk)
-    #         except StopIteration:
-    #             print('[Info]: Iteration is stopped.')
-    #     pool.close()
-    #     pool.join()
-    #     chunks = [x.get() for x in chunks]
-    #     df = pd.concat(chunks, ignore_index=True, sort=False, axis=0)
-    #     return df
 
 
 if __name__ == '__main__':
@@ -353,8 +316,4 @@ if __name__ == '__main__':
     quiet_logs(sc)
     sc.setLogLevel('Error')
     ph = Py4jHdfs(sc)
-    print('*' * 100)
-    print(sys.version)
-    print('*' * 100)
-    # data = ph.read_hdfs('/srv/smartcare/calc_input/cn/special/src/fire_metrics/homb/fire_detail/detail_homb_fire_metric_20191202.csv', sep='|')
-    # data = ph.multi_read_hdfs('/srv/smartcare/calc_input/cn/special/src/fire_metrics/homb/fire_detail/detail_homb_fire_metric_20191202.csv', sep='|')
+    # data = ph.read_hdfs('/hdfs/example.csv', sep=',')
