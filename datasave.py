@@ -2,7 +2,7 @@
 import time
 import pandas as pd
 import numpy as np
-from utils.py4jhdfs import Py4jHdfs
+from py4jhdfs import Py4jHdfs
 from pyspark.sql import HiveContext, SQLContext
 from pyspark.sql.types import *
 
@@ -63,11 +63,11 @@ def csv_writer(sc, spark_df, save_path, sep=',', with_header=True, n_partitions=
     write spark dataframe to csv files with one line header.
     
     exampe:
-    data = hc.read.csv('/kt/lem/calc_input/cn/special/src/homb_satisfy/homb_investigate_label_%s.tsv' % 202008,
+    data = hc.read.csv('/hdfs/example.tsv',
                        sep='\t',
                        header=True,
                       ).limit(50).repartition(10)
-    csv_writer(sc, data, save_path='/kt/lem/calc_input/cn/special/tmp/test.csv', sep=',', n_partitions=None)
+    csv_writer(sc, data, save_path='/hdfs/example_output.csv', sep=',', n_partitions=None)
     """
     ph = Py4jHdfs(sc)
     if mode == 'overwrite':
@@ -94,7 +94,7 @@ def csv_reader(sc, file_dir, sep=',', header_path='/header.csv', **kwargs):
     read csv files to spark dataframe with one line header.
     
     exampe:
-    df = csv_reader(sc, '/kt/lem/calc_input/cn/special/tmp/test.csv')
+    df = csv_reader(sc, '/hdfs/example.csv')
     df.show(100)
     """
     hc = HiveContext(sc)
@@ -281,4 +281,18 @@ def write_pd_dataframe_to_hive_table_by_partition(hc, input_df, field_list, dtyp
 
 
 if __name__ == '__main__':
-    print(to_float(None))
+    # exampe:
+    from pyspark import SparkContext, SparkConf
+    from pyspark.sql import HiveContext, SQLContext
+
+    conf = SparkConf()
+    sc = SparkContext(conf=conf)
+    hc = HiveContext(sc)
+    sqlContext = SQLContext(sc)
+    ph = Py4jHdfs(sc)
+    data = hc.read.csv('/hdfs/example.tsv',
+                       sep='\t',
+                       header=True,
+                      ).limit(50).repartition(10)
+    csv_writer(sc, data, save_path='/hdfs/example_output.csv', sep=',', n_partitions=None)
+    df = csv_reader(sc, '/hdfs/example_output.csv')
